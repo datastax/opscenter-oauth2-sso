@@ -1,0 +1,8 @@
+{
+  "login_url" : "http://localhost:8081/auth",
+  "token_url" : "http://localhost:8081",
+  "opscenter_url" : "http://localhost:8888",
+  "auth_code_param" : "code",
+  "client_id" : "james",
+  "client_secret" : "somelongstring"
+}
