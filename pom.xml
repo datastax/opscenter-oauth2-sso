@@ -39,6 +39,15 @@
       <artifactId>config</artifactId>
       <version>1.4.0</version>
     </dependency>
+    <!-- installed the opscenter auth jar into my local repo like this:
+    mvn install:install-file \
+      -Dfile=/Users/jamescolvin/Downloads/opscenter-6.7.8/auth/opscenter-auth-api-6.7.8.jar \
+      -DgroupId=com.datastax.opscenter.auth \
+      -DartifactId=http \
+      -Dversion=6.7.8 \
+      -Dpackaging=jar \
+      -DgeneratePom=true
+    -->
     <dependency>
       <groupId>com.datastax.opscenter.auth</groupId>
       <artifactId>http</artifactId>

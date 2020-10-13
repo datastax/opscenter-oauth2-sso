@@ -1,8 +1,8 @@
 {
-  "login_url" : "http://localhost:8081/auth",
-  "token_url" : "http://localhost:8081",
+  "login_url" : "http://localhost:8081/auth/oauth/authorize",
+  "token_url" : "http://localhost:8081/auth/oauth/token",
   "opscenter_url" : "http://localhost:8888",
   "auth_code_param" : "code",
-  "client_id" : "james",
-  "client_secret" : "somelongstring"
+  "client_id" : "R2dpxQ3vPrtfgF72",
+  "client_secret" : "fDw7Mpkk5czHNuSRtmhGmAGL42CaxQB9"
 }
