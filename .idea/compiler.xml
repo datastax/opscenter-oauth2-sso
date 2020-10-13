@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="oauth2-sso" target="1.7" />
+      <module name="oauth2-sso" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>
