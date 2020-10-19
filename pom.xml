@@ -30,14 +30,14 @@
       <version>3.1.0</version>
     </dependency>
     <dependency>
-      <groupId>org.pac4j</groupId>
-      <artifactId>pac4j-oauth</artifactId>
-      <version>4.1.0</version>
+      <groupId>org.dmfs</groupId>
+      <artifactId>oauth2-essentials</artifactId>
+      <version>0.18</version>
     </dependency>
     <dependency>
-      <groupId>com.typesafe</groupId>
-      <artifactId>config</artifactId>
-      <version>1.4.0</version>
+      <groupId>org.dmfs</groupId>
+      <artifactId>httpurlconnection-executor</artifactId>
+      <version>0.20</version>
     </dependency>
     <!-- installed the opscenter auth jar into my local repo like this:
     mvn install:install-file \
