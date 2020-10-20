@@ -51,9 +51,9 @@ authentication_method = com.datastax.opscenter.auth.http.impl.OAuth2Provider
 [authentication_provider]
 client_id = id
 client_secret = SuperSecret
-authorization_url = https://www.facebook.com/v8.0/dialog/oauth
-token_url = https://graph.facebook.com/v8.0/oauth/access_token
-redirect_url = http://localhost:8888
+authorization_url = authorization.oauth2
+token_url = token.oauth2
+redirect_url = opscenter.url
 scope = "openid, profile"
 grant_type = client_credentials
 response_type = code
