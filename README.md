@@ -36,6 +36,7 @@ After building the auth jar, place it in OpsCenter's classpath. All of the requi
     - `install_location/opscenter/lib/jvm`
 - Package Install
     - `etc/opscenter/lib/jvm`
+    - `usr/share/opscenter/lib/jvm`
 ## Configuration File Updates
 Ensure in the `[authentication]` section that `enabled = True` and `authentication_method = com.datastax.opscenter.auth.http.impl.OAuth2Provider`.
 Add the `[authentication_provider]` section with the below configuration keys. Adding additional keys can be accomplished by modifying the `build`
