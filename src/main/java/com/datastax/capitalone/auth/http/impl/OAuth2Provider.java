@@ -1,4 +1,4 @@
-package com.datastax.opscenter.auth.http.impl;
+package com.datastax.capitalone.auth.http.impl;
 
 import com.datastax.opscenter.auth.http.AuthenticationStrategy;
 import com.datastax.opscenter.auth.http.AuthenticationStrategyProvider;
@@ -45,7 +45,9 @@ public class OAuth2Provider implements AuthenticationStrategyProvider {
                 required(config,"redirect_url"),
                 required(config,"scope"),
                 required(config,"grant_type"),
-                required(config,"response_type")
+                required(config,"response_type"),
+                required(config,"userinfo_url"),
+                required(config,"username_attribute")
         );
     }
 }

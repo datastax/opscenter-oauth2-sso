@@ -29,7 +29,7 @@ Also, a file denoting the location of the auth class must be located in a specif
 - The specific directory is `META-INF/services/` and the name of the file must be `com.datastax.opscenter.auth.http.AuthenticationStrategyProvider`.
     - In Maven, this is accomplished by including the directories and file in the `./src/main/resources` directory.
 - The contents of the file must be the fully qualified package name of your Auth _Provider_ class.
-    - e.g. `com.datastax.opscenter.auth.http.impl.OAuth2Provider` 
+    - e.g. `OAuth2Provider` 
 ### Classpath Location
 After building the auth jar, place it in OpsCenter's classpath. All of the required jars for OpsCenter will be in this directory.
 - Tarball Install
@@ -38,7 +38,7 @@ After building the auth jar, place it in OpsCenter's classpath. All of the requi
     - `etc/opscenter/lib/jvm`
     - `usr/share/opscenter/lib/jvm`
 ## Configuration File Updates
-Ensure in the `[authentication]` section that `enabled = True` and `authentication_method = com.datastax.opscenter.auth.http.impl.OAuth2Provider`.
+Ensure in the `[authentication]` section that `enabled = True` and `authentication_method = OAuth2Provider`.
 Add the `[authentication_provider]` section with the below configuration keys. Adding additional keys can be accomplished by modifying the `build`
 method in the OAuth2Provider class and the OAuth2 constructor in the OAuth2 class. 
 ```
@@ -47,7 +47,7 @@ method in the OAuth2Provider class and the OAuth2 constructor in the OAuth2 clas
 # account will be created with the username "admin" and password "admin".
 # Accounts and roles can then be created and modified from within the web UI.
 enabled = True
-authentication_method = com.datastax.opscenter.auth.http.impl.OAuth2Provider
+authentication_method = OAuth2Provider
 
 [authentication_provider]
 client_id = id
