@@ -42,7 +42,8 @@ Locations for the OpsCenter classpath may vary by installation, but can generall
 ## Configuration File Updates
 Ensure in the `[authentication]` section that `enabled = True` and `authentication_method = com.datastax.opscenter.auth.http.impl.OAuth2StrategyProvider`.
 Add the `[authentication_provider]` section with the below configuration keys. Adding additional keys can be accomplished by modifying the `build`
-method in the `OAuth2StrategyProvider` class and the OAuth2 constructor in the `OAuth2Strategy` class. 
+method in the `OAuth2StrategyProvider` class and the OAuth2 constructor in the `OAuth2Strategy` class. In order to achieve a user's login with admin-level permissions,
+ensure `admin_role_name` matches the value within `role_attribute`.
 The below methodology will allow you to login to OpsCenter with a test GitHub application.  
 ```
 [authentication]
@@ -64,6 +65,7 @@ grant_type = authorization_code
 response_type = code
 username_attribute = name
 role_attribute = type
+admin_role_name = User
 ```
 ### Multiple Authentication Strategy
 See [this link](https://docs.datastax.com/en/opscenter/6.8/opsc/configure/opscPluggableAuth.html) for examples on chaining strategies within OpsCenter.
