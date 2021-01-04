@@ -1,1 +1,1 @@
-com.datastax.capitalone.auth.http.impl.OAuth2Provider
+com.datastax.opscenter.auth.http.impl.OAuth2StrategyProvider
