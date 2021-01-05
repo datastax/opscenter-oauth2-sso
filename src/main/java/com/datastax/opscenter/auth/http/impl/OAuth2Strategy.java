@@ -72,6 +72,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
         //This should be the initial login request, no URL parameters
         if(urlParams.isEmpty()) {
             //Generate the state parameter to mitigate CSRF
+            //https://auth0.com/docs/protocols/state-parameters
             stateString = RandomStringUtils.randomAlphanumeric(32);
             String initialAuth =
                     sBuilder.append(authUrl)
@@ -82,6 +83,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
                             .append("&state=").append(stateString)
                             .toString();
             //Initial redirect to OAuth2 provider authentication endpoint
+            log.info("[OAuth2Strategy] Attempted OAuth / SSO Redirect with redirect URL: " + initialAuth);
             throw new RedirectException(initialAuth);
         }
         else if (urlParams.containsKey("code") && stateString.equals(httpServletRequest.getParameter("state"))){
@@ -94,6 +96,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
             //Append grant_type if present. Some OAuth providers do not require
             grant_type.ifPresent(s -> tokenReq.append("&grant_type=").append(s));
             String tokenReqSt = tokenReq.toString();
+            log.info("[OAuth2Strategy] Token request URL is "+tokenReqSt);
             Request reqToken = new Request.Builder().url(tokenReqSt)
                     .method("POST",RequestBody.create("",MediaType.parse("application/x-www-form-urlencoded")))
                     .addHeader("content-type","application/x-www-form-urlencoded")
@@ -102,6 +105,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
             Response respToken = null;
             try {
                 respToken = okClient.newCall(reqToken).execute();
+                log.info("[OAuth2Strategy] Token request response is "+respToken.toString());
             }
             catch (Exception e) {
                 throw new AuthenticationException("[OAuth2Strategy] An error has occurred while trying to REQUEST a bearer token"+System.lineSeparator()+e);
@@ -111,6 +115,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
                 try{
                     JSONObject respBody = (JSONObject) jParser.parse(Objects.requireNonNull(respToken.body()).string());
                     accessToken = respBody.get("access_token").toString();
+                    log.info("[OAuth2Strategy] OAuth Access Token is: "+ accessToken);
                 }
                 catch(IOException | ParseException e){
                     throw new AuthenticationException("[OAuth2Strategy] An error has occurred while trying to RETRIEVE a bearer token"+System.lineSeparator()+e);
@@ -134,7 +139,10 @@ public class OAuth2Strategy implements AuthenticationStrategy {
         //Use UserInfo response to build OpsCenter role
         Set<String> roles = new HashSet<>();
         if (userInfoObj.containsKey(role_attribute)){
+            log.info("[OAuth2Strategy] UserInfo contains role attribute");
             Object jRoles = userInfoObj.get(role_attribute);
+            log.info("[OAuth2Strategy] Role attribute is "+role_attribute+" and role information is "+userInfoObj.get(role_attribute).toString());
+            log.info("[OAuth2Strategy] UserInfo Response body is "+ userInfoObj.toString());
             if (jRoles instanceof JSONArray) {
                 ((JSONArray) jRoles).forEach(r -> {
                     //Check to see if the supplied role attribute array matches the Admin role
