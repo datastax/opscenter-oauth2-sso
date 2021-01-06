@@ -30,7 +30,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
     private final String clientSecret;
     private final String redirect_url;
     private final String scope;
-    private final Optional<String> grant_type;
+    private final String grant_type;
     private final String response_type;
     private final String userinfo_url;
     private final String username_attribute;
@@ -41,7 +41,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
     private String stateString;
 
     public OAuth2Strategy(String client_id, String client_secret, String authorization_url, String token_url, String redirect_url,
-                          String scope, Optional<String> grant_type, String response_type, String userinfo_url, String username_attribute,
+                          String scope, String grant_type, String response_type, String userinfo_url, String username_attribute,
                           String role_attribute, String admin_role_name) {
         this.authUrl            = authorization_url;
         this.tokenUrl           = token_url;
@@ -74,28 +74,27 @@ public class OAuth2Strategy implements AuthenticationStrategy {
             //Generate the state parameter to mitigate CSRF
             //https://auth0.com/docs/protocols/state-parameters
             stateString = RandomStringUtils.randomAlphanumeric(32);
-            String initialAuth =
-                    sBuilder.append(authUrl)
-                            .append("?response_type=").append(response_type)
-                            .append("&client_id=").append(clientId)
-                            .append("&redirect_uri=").append(redirect_url)
-                            .append("&scope=").append(scope)
-                            .append("&state=").append(stateString)
-                            .toString();
+            HttpUrl authEndpoint = HttpUrl.get(authUrl);
+            String initialAuth = authEndpoint.newBuilder()
+                    .addQueryParameter("response_type",response_type)
+                    .addQueryParameter("client_id",clientId)
+                    .addQueryParameter("redirect_uri",redirect_url)
+                    .addQueryParameter("scope",scope)
+                    .addQueryParameter("state",stateString)
+                    .build().toString();
             //Initial redirect to OAuth2 provider authentication endpoint
             log.info("[OAuth2Strategy] Attempted OAuth / SSO Redirect with redirect URL: " + initialAuth);
             throw new RedirectException(initialAuth);
         }
         else if (urlParams.containsKey("code") && stateString.equals(httpServletRequest.getParameter("state"))){
-            StringBuilder tokenReq =
-                    sBuilder.append(tokenUrl)
-                            .append("?code=").append(httpServletRequest.getParameter("code"))
-                            .append("&client_id=").append(clientId)
-                            .append("&client_secret=").append(clientSecret)
-                            .append("&redirect_uri=").append(redirect_url);
-            //Append grant_type if present. Some OAuth providers do not require
-            grant_type.ifPresent(s -> tokenReq.append("&grant_type=").append(s));
-            String tokenReqSt = tokenReq.toString();
+            HttpUrl tokenEndpoint = HttpUrl.get(tokenUrl);
+            String tokenReqSt = tokenEndpoint.newBuilder()
+                    .addQueryParameter("code",httpServletRequest.getParameter("code"))
+                    .addQueryParameter("client_id",clientId)
+                    .addQueryParameter("client_secret",clientSecret)
+                    .addQueryParameter("redirect_uri",redirect_url)
+                    .addQueryParameter("grant_type",grant_type)
+                    .build().toString();
             log.info("[OAuth2Strategy] Token request URL is "+tokenReqSt);
             Request reqToken = new Request.Builder().url(tokenReqSt)
                     .method("POST",RequestBody.create("",MediaType.parse("application/x-www-form-urlencoded")))
@@ -106,20 +105,22 @@ public class OAuth2Strategy implements AuthenticationStrategy {
             try {
                 respToken = okClient.newCall(reqToken).execute();
                 log.info("[OAuth2Strategy] Token request response is "+respToken.toString());
+                if(respToken.code()==200){
+                    try{
+                        JSONObject respBody = (JSONObject) jParser.parse(Objects.requireNonNull(respToken.body()).string());
+                        accessToken = respBody.get("access_token").toString();
+                        log.info("[OAuth2Strategy] OAuth Access Token is: "+ accessToken);
+                    }
+                    catch(IOException | ParseException e){
+                        throw new AuthenticationException(
+                            "[OAuth2Strategy] An error has occurred while trying to RETRIEVE a bearer token from the response"+System.lineSeparator()+e
+                        );
+                    }
+                }
+                else throw new AuthenticationException("[OAuth2Strategy] Token request unsuccessful"+System.lineSeparator()+respToken.toString());
             }
             catch (Exception e) {
                 throw new AuthenticationException("[OAuth2Strategy] An error has occurred while trying to REQUEST a bearer token"+System.lineSeparator()+e);
-            }
-            if(respToken.code()!=200) throw new AuthenticationException("[OAuth2Strategy] Token request unsuccessful"+System.lineSeparator()+respToken.toString());
-            else {
-                try{
-                    JSONObject respBody = (JSONObject) jParser.parse(Objects.requireNonNull(respToken.body()).string());
-                    accessToken = respBody.get("access_token").toString();
-                    log.info("[OAuth2Strategy] OAuth Access Token is: "+ accessToken);
-                }
-                catch(IOException | ParseException e){
-                    throw new AuthenticationException("[OAuth2Strategy] An error has occurred while trying to RETRIEVE a bearer token"+System.lineSeparator()+e);
-                }
             }
         }
         else throw new AuthenticationException("[OAuth2Strategy] There has been a problem retrieving OAuth authentication or authorization");

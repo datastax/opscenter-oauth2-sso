@@ -43,7 +43,7 @@ public class OAuth2StrategyProvider implements AuthenticationStrategyProvider {
                 required(config,"token_url"),
                 required(config,"redirect_url"),
                 required(config,"scope"),
-                optional(config,"grant_type"),
+                required(config,"grant_type"),
                 required(config,"response_type"),
                 required(config,"userinfo_url"),
                 required(config,"username_attribute"),
