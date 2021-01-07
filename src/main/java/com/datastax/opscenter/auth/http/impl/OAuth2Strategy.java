@@ -90,14 +90,14 @@ public class OAuth2Strategy implements AuthenticationStrategy {
             HttpUrl tokenEndpoint = HttpUrl.get(tokenUrl);
             String tokenReqSt = tokenEndpoint.newBuilder()
                     .addQueryParameter("code",httpServletRequest.getParameter("code"))
-                    .addQueryParameter("client_id",clientId)
-                    .addQueryParameter("client_secret",clientSecret)
                     .addQueryParameter("redirect_uri",redirect_url)
                     .addQueryParameter("grant_type",grant_type)
                     .build().toString();
             log.info("[OAuth2Strategy] Token request URL is "+tokenReqSt);
+            String clientIdAndSecret = clientId+":"+clientSecret;
             Request reqToken = new Request.Builder().url(tokenReqSt)
                     .method("POST",RequestBody.create("",MediaType.parse("application/x-www-form-urlencoded")))
+                    .addHeader("Authorization","Basic "+Base64.getEncoder().encodeToString(clientIdAndSecret.getBytes()))
                     .addHeader("content-type","application/x-www-form-urlencoded")
                     .addHeader("accept","application/json")
                     .build();
