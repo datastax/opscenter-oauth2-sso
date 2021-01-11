@@ -48,7 +48,7 @@ public class OAuth2StrategyProvider implements AuthenticationStrategyProvider {
                 required(config,"userinfo_url"),
                 required(config,"username_attribute"),
                 required(config,"role_attribute"),
-                required(config,"admin_role_name")
-        );
+                required(config,"admin_role_name"),
+                required(config,"use_base64_token_request"));
     }
 }
