@@ -70,7 +70,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
                 .addQueryParameter("state",stateString)
                 .build().toString();
         //Initial redirect to OAuth2 provider authentication endpoint
-        log.info("[OAuth2Strategy] Attempted OAuth / SSO Redirect with redirect URL: " + initialAuth);
+        log.debug("[OAuth2Strategy] Attempted OAuth / SSO Redirect with redirect URL: " + initialAuth);
         throw new RedirectException(initialAuth);
     }
 
@@ -81,7 +81,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
                 .addQueryParameter("redirect_uri",redirect_url)
                 .addQueryParameter("grant_type",grant_type)
                 .build().toString();
-        log.info("[OAuth2Strategy] Token request URL is "+tokenReqSt);
+        log.debug("[OAuth2Strategy] Token request URL is "+tokenReqSt);
         String clientIdAndSecret = clientId+":"+clientSecret;
         return
             new Request.Builder().url(tokenReqSt)
@@ -101,7 +101,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
                 .addQueryParameter("client_secret",clientSecret)
                 .addQueryParameter("grant_type",grant_type)
                 .build().toString();
-        log.info("[OAuth2Strategy] Token request URL is "+tokenReqSt);
+        log.debug("[OAuth2Strategy] Token request URL is "+tokenReqSt);
         return
             new Request.Builder().url(tokenReqSt)
                 .method("POST",RequestBody.create("",MediaType.parse("application/x-www-form-urlencoded")))
@@ -122,7 +122,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
         Response respToken = null;
         try {
             respToken = okClient.newCall(requestToken).execute();
-            log.info("[OAuth2Strategy] Token request response is " + respToken.toString());
+            log.debug("[OAuth2Strategy] Token request response is " + respToken.toString());
         } catch (Exception e) {
             throw new AuthenticationException("[OAuth2Strategy] An error has occurred while trying to REQUEST an access token"+System.lineSeparator()+e);
         }
@@ -130,7 +130,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
             try {
                 JSONObject respBody = (JSONObject) jParser.parse(Objects.requireNonNull(respToken.body()).string());
                 accessToken = respBody.get("access_token").toString();
-                log.info("[OAuth2Strategy] OAuth Access Token is: "+ accessToken);
+                log.debug("[OAuth2Strategy] OAuth Access Token is: "+ accessToken);
             } catch(Exception e) {
                 throw new AuthenticationException(
                     "[OAuth2Strategy] An error has occurred while trying to RETRIEVE a bearer token from the response"+System.lineSeparator()+e
@@ -145,8 +145,8 @@ public class OAuth2Strategy implements AuthenticationStrategy {
         try {
             Response response = okClient.newCall(userInfoReq).execute();
             userInfoObject = (JSONObject) jParser.parse(Objects.requireNonNull(response.body()).string());
-            log.info("[OAuth2Strategy] User Info request response is "+response.toString());
-            log.info("[OAuth2Strategy] User Info response body is "+userInfoObject.toString());
+            log.debug("[OAuth2Strategy] User Info request response is "+response.toString());
+            log.debug("[OAuth2Strategy] User Info response body is "+userInfoObject.toString());
         }
         catch (Exception e){
             throw new AuthenticationException("[OAuth2Strategy] An error has occurred while retrieving User's Information"+System.lineSeparator()+e);
@@ -157,7 +157,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
     private Set<String> getRolesFromUserInfo(JSONObject jObj) {
         Object jRoles = jObj.get(role_attribute);
         Set<String> rolesSet = new HashSet<>();
-        log.info("[OAuth2Strategy] Role attribute is "+role_attribute+" and role information is "+jObj.get(role_attribute).toString());
+        log.debug("[OAuth2Strategy] Role attribute is "+role_attribute+" and role information is "+jObj.get(role_attribute).toString());
         if (jRoles instanceof JSONArray) {
             ((JSONArray) jRoles).forEach(r -> {
                     //Check to see if the supplied role attribute array matches the Admin role
@@ -207,7 +207,7 @@ public class OAuth2Strategy implements AuthenticationStrategy {
         Request userInfoRequest = getUserInfoRequest();
         userInfoObj = getUserInfo(userInfoRequest,okClient,jParser);
         if (userInfoObj.containsKey(role_attribute)){
-            log.info("[OAuth2Strategy] UserInfo contains role attribute");
+            log.debug("[OAuth2Strategy] UserInfo contains role attribute");
             roles = getRolesFromUserInfo(userInfoObj);
         }
         else throw new AuthenticationException("[OAuth2Strategy] No role attribute was found");

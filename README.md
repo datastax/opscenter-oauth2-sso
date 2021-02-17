@@ -11,12 +11,12 @@ The below directories contain the authentication framework SDK jar and API docum
     - `install_location/opscenter/auth`
 - Package Install
     - `usr/share/opscenter/auth`
-### SDK Dependency
-The OpsCenter Auth API should be placed into the project's imported libraries, or installed into the local dependency library. In Maven, this is 
-accomplished by running the following command (the example is based on a package install):
+## SDK Dependency
+The OpsCenter Auth API should be placed into the project's imported libraries, or installed into the local dependency library.
+In Maven, installing in the local library is accomplished by running the following command:
 ```bash
 mvn install:install-file \
-      -Dfile=/usr/share/opscenter/auth/opscenter-auth-api-6.7.8.jar \
+      -Dfile=/path/to/opscenter/auth/jar/opscenter-auth-api-6.7.8.jar \
       -DgroupId=com.datastax.opscenter.auth \
       -DartifactId=http \
       -Dversion=6.7.8 \
@@ -24,14 +24,15 @@ mvn install:install-file \
       -DgeneratePom=true
 ```
 ## Building The Auth Jar
-Ensure that the jar is compiled with all dependencies (UberJar) and is placed in the OpsCenter classpath noted below.
+Ensure that the jar is compiled with all dependencies (UberJar) by running `mvn package` and is placed in the OpsCenter classpath noted below.
 Also, a file denoting the location of the auth class must be located in a specific directory within the compiled jar.
 - The specific directory is `META-INF/services/` and the name of the file must be `com.datastax.opscenter.auth.http.AuthenticationStrategyProvider`.
     - In Maven, this is accomplished by including the directories and file in the `./src/main/resources` directory.
 - The contents of the file must be the fully qualified package name of your Auth _Provider_ class.
-    - e.g. `com.datastax.opscenter.auth.http.impl.OAuth2StrategyProvider` 
-### Classpath Location
-After building the auth jar, place it in OpsCenter's classpath. All of the required jars for OpsCenter will be in this directory, 
+    - e.g. `com.datastax.opscenter.auth.http.impl.OAuth2StrategyProvider`
+This will be automatically accomplished by running `mvn package`.
+## Classpath Location
+After building the auth jar, place it in OpsCenter's classpath. All the required jars for OpsCenter will be in this directory, 
 so if you find a directory with a lot of jar files you're probably in the right place.
 Locations for the OpsCenter classpath may vary by installation, but can generally be found in the following locations: 
 - Tarball Install
@@ -66,7 +67,5 @@ response_type = code
 username_attribute = name
 role_attribute = type
 admin_role_name = User
+use_base64_token_request = true
 ```
-### Multiple Authentication Strategy
-See [this link](https://docs.datastax.com/en/opscenter/6.8/opsc/configure/opscPluggableAuth.html) for examples on chaining strategies within OpsCenter.
-This will allow you to use both OAuth2 and LDAP if required.
